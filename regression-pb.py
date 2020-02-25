@@ -4,7 +4,8 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import seaborn as sb
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # version of tf
 print(tf.__version__)  # 2.0.0
@@ -41,7 +42,26 @@ dataset['USA'] = (origin==1)*1.0
 dataset['Eroupe'] = (origin==2)*1.0
 dataset['Japan'] = (origin==3)*1.0
 print(dataset.tail())
-#TODO split data in 2 part : test and train data
+# split data in 2 part : test and train data
 train_dataset = dataset.sample(frac=0.8,random_state=0)
 test_dataset = dataset.drop(train_dataset.index)
- 
+ # TODO inspect data for well genelazation  using seaborn module(sns)
+pairpt = sns.pairplot(train_dataset[["mpg",
+    "cylinders",
+    "displacement",
+    "weight"]],diag_kind="kde") 
+plt.show()
+
+seperate = "-----------------------------------------------------------"
+# statistics of data
+train_stats = dataset.describe()
+train_stats.pop('mpg')
+#print(train_stats)
+train_stats = train_stats.transpose()
+print(train_stats)
+print(seperate)
+#split fature from label -> that is ours ouput you want to predicted
+train_labels = train_dataset.pop('mpg')
+test_labels = test_dataset.pop('mpg')
+print(train_labels)
+print(seperate)
