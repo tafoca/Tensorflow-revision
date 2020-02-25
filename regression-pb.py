@@ -4,6 +4,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import seaborn as sb
 
 # version of tf
 print(tf.__version__)  # 2.0.0
@@ -40,3 +41,7 @@ dataset['USA'] = (origin==1)*1.0
 dataset['Eroupe'] = (origin==2)*1.0
 dataset['Japan'] = (origin==3)*1.0
 print(dataset.tail())
+#TODO split data in 2 part : test and train data
+train_dataset = dataset.sample(frac=0.8,random_state=0)
+test_dataset = dataset.drop(train_dataset.index)
+ 
