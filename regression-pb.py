@@ -27,7 +27,16 @@ raw_data = pd.read_csv(dataset_path, names=colunm_name,
                        na_values="?", comment="\t", sep=" ", skipinitialspace=True)
 
 dataset = raw_data.copy()
-print(dataset.head())
+#print(dataset.head()) #5 head lines
+print(dataset.tail())
 print(dataset.isna().sum()) # car name -> na values 398
 # colunm origin is really categoricial but it convert in numerical 
 # use one shot vector of correspondance key city to one numvalue
+dataset =dataset.dropna()
+print(dataset.isna().sum()) 
+#convert to onehot vector
+origin = dataset.pop('origin')
+dataset['USA'] = (origin==1)*1.0
+dataset['Eroupe'] = (origin==2)*1.0
+dataset['Japan'] = (origin==3)*1.0
+print(dataset.tail())
