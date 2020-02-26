@@ -23,45 +23,82 @@ colunm_name = [
     "acceleration",
     " model year",
     "origin",
-   # "car name"
+    # "car name"
 ]
 raw_data = pd.read_csv(dataset_path, names=colunm_name,
                        na_values="?", comment="\t", sep=" ", skipinitialspace=True)
 
 dataset = raw_data.copy()
-#print(dataset.head()) #5 head lines
+# print(dataset.head()) #5 head lines
 print(dataset.tail())
-print(dataset.isna().sum()) # car name -> na values 398
-# colunm origin is really categoricial but it convert in numerical 
+print(dataset.isna().sum())  # car name -> na values 398
+# colunm origin is really categoricial but it convert in numerical
 # use one shot vector of correspondance key city to one numvalue
-dataset =dataset.dropna()
-print(dataset.isna().sum()) 
-#convert to onehot vector
+dataset = dataset.dropna()
+print(dataset.isna().sum())
+# convert to onehot vector
 origin = dataset.pop('origin')
-dataset['USA'] = (origin==1)*1.0
-dataset['Eroupe'] = (origin==2)*1.0
-dataset['Japan'] = (origin==3)*1.0
+dataset['USA'] = (origin == 1)*1.0
+dataset['Eroupe'] = (origin == 2)*1.0
+dataset['Japan'] = (origin == 3)*1.0
 print(dataset.tail())
 # split data in 2 part : test and train data
-train_dataset = dataset.sample(frac=0.8,random_state=0)
+train_dataset = dataset.sample(frac=0.8, random_state=0)
 test_dataset = dataset.drop(train_dataset.index)
- # TODO inspect data for well genelazation  using seaborn module(sns)
+# TODO inspect data for well genelazation  using seaborn module(sns)
 pairpt = sns.pairplot(train_dataset[["mpg",
-    "cylinders",
-    "displacement",
-    "weight"]],diag_kind="kde") 
+                                     "cylinders",
+                                     "displacement",
+                                     "weight"]], diag_kind="kde")
 plt.show()
 
 seperate = "-----------------------------------------------------------"
 # statistics of data
 train_stats = dataset.describe()
 train_stats.pop('mpg')
-#print(train_stats)
+# print(train_stats)
 train_stats = train_stats.transpose()
 print(train_stats)
 print(seperate)
-#split fature from label -> that is ours ouput you want to predicted
+# split fature from label -> that is ours ouput you want to predicted
 train_labels = train_dataset.pop('mpg')
 test_labels = test_dataset.pop('mpg')
-print(train_labels)
+# print(train_labels)
 print(seperate)
+
+# Normalize the data
+
+
+def norme(x):
+    return (x - train_stats['mean']) / train_stats['std']
+
+
+normed_train_dataset = norme(train_dataset)
+normed_test_dataset = norme(test_dataset)
+
+# build the model with kereas api
+
+
+def build_model():
+    model = keras.Sequential(
+        [
+            layers.Dense(64, activation=tf.nn.relu, input_shape=[
+                         len(train_dataset.keys())]),
+            layers.Dense(64, activation=tf.nn.relu),
+            layers.Dense(1)
+
+        ]
+    )
+
+    optimizer = tf.keras.optimizers.RMSprop(0.001)
+    model.compile(loss="mse", optimizer=optimizer,
+                  metrics=['mae', 'mse'])
+    return model
+#Create a model
+model = build_model()
+# Inspect model or summarize
+model.summary()
+#test model with batch example
+batch_examples = normed_train_dataset[:10]
+example_result = model.predict(batch_examples)
+print (example_result)
