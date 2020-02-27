@@ -94,11 +94,75 @@ def build_model():
     model.compile(loss="mse", optimizer=optimizer,
                   metrics=['mae', 'mse'])
     return model
-#Create a model
+
+
+# Create a model
 model = build_model()
 # Inspect model or summarize
 model.summary()
-#test model with batch example
+# test model with batch example
 batch_examples = normed_train_dataset[:10]
 example_result = model.predict(batch_examples)
-print (example_result)
+print(example_result)
+# Train model and record the train in table and histogram
+
+
+class PrintDot(keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs):
+        if epoch % 100 == 0:
+            print('')
+        print('.', end='')
+
+
+EPOCHS = 1000
+# use 20% for validation
+history = model.fit(normed_train_dataset,
+                    train_labels,
+                    epochs=EPOCHS,
+                    validation_split=0.2,
+                    verbose=0,
+                    callbacks=[PrintDot()])
+
+# visualize progress of traning model using statsin history objects
+print(seperate)
+hist = pd.DataFrame(history.history)
+hist['epoch'] = history.epoch
+print(hist.tail())
+# plot progress in histogram
+
+
+def plot_history(history):
+    hist = pd.DataFrame(history.history)
+    hist['epoch'] = history.epoch
+    plt.figure()
+    plt.xlabel('Epoch')
+    plt.ylabel('Mean Abs Error [mpg]')
+    plt.plot(hist['epoch'],
+             hist['mae'],
+             label='Train error'
+             )
+    plt.plot(hist['epoch'],
+             hist['val_mae'],
+             label='Val error'
+             )
+    plt.legend()
+    plt.ylim([0, 20])
+
+    plt.figure()
+    plt.xlabel('Epoch')
+    plt.ylabel('Mean Square Error [mpg]')
+    plt.plot(hist['epoch'],
+             hist['mse'],
+             label='Train error'
+             )
+    plt.plot(hist['epoch'],
+             hist['val_mse'],
+             label='Val error'
+             )
+    plt.legend()
+    plt.ylim([0, 20])
+    
+   
+    
+plot_history(history)
+plt.show()
