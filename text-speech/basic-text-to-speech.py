@@ -5,7 +5,8 @@ from pydub import AudioSegment
 from pydub.playback import play
 
 #case google api gtts google text to speech
-myText = "Text to speech Conversion using python and gtts."
+file_handle = open("text.txt","r")
+myText = file_handle.read().replace("\n", " ")
 language = 'en'
 def main(): 
     
