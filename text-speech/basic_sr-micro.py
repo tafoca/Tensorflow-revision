@@ -6,17 +6,23 @@ def main():
 
     #definite source of stream data income
     with sr.Microphone() as source: 
+        r.adjust_for_ambient_noise(source)
         #invitation message 
-        print('Say anithing!')
+        print('Please Say anithing! ...')
         #get audio to source
         audio = r.listen(source)
 
         try:
             text = r.recognize_google(audio)
-            print('You said : {}'.format(text))
-        except:
-            print('Sorry can not reconize audio ')
+            print('You have said : {}'.format(text))
             
-if __name__ = "__main__": 
+       
+        except Exception as e:
+            print('Error : '+str(e))
+            
+            
+        with open("recordaudio.wav","wb") as f:
+            f.write(audio.get_wav_data())
+            
+if __name__ == "__main__":
     main()
-    
